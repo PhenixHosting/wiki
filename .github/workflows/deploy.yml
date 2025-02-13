@@ -1,0 +1,27 @@
+name: Deploy the Docs
+on:
+  push:
+    branches:
+      - 5.9.x
+permissions:
+  contents: write
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+      - uses: actions/cache@v4
+        with:
+          key: ${{ github.ref }}
+          path: .cache
+      - run: git pull
+      - run: git config user.name github-actions
+      - run: git config user.email github-actions@github.com
+      - run: pip install mkdocs-glightbox
+      - run: pip install mkdocs-material
+      - run: pip install mkdocs-static-i18n
+      - run: pip install mike
+      - run: mike deploy 5.9.x latest --update-aliases --push -F ./config/mkdocs.yml
